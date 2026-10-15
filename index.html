@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Vocabulaire">
+<title>Vocabulaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* Couleurs (mode clair / mode sombre) --------------------------------- */
+:root {
+  --fond: #fbf7fc; --carte: #ffffff; --texte: #2b2433; --doux: #786d86; --ligne: #ebe3f1;
+  --oui-fond: #d9f7e4; --oui: #1a7f45; --non-fond: #fde2e4; --non: #b4232f;
+  --c: #a855f7;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fond: #1b1722; --carte: #27212f; --texte: #f2edf6; --doux: #aa9fb7; --ligne: #3a3144;
+    --oui-fond: #1e3f2c; --oui: #9ef0bd; --non-fond: #4a2228; --non: #ffb3ba;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fond: #1b1722; --carte: #27212f; --texte: #f2edf6; --doux: #aa9fb7; --ligne: #3a3144;
+  --oui-fond: #1e3f2c; --oui: #9ef0bd; --non-fond: #4a2228; --non: #ffb3ba;
+  color-scheme: dark;
+}
+
+/* Base ---------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--fond); color: var(--texte);
+  font-family: Nunito, system-ui, -apple-system, sans-serif; font-size: 16px;
+  -webkit-tap-highlight-color: transparent;
+}
+#fond {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 8% 0%, color-mix(in srgb, var(--c) 32%, transparent), transparent),
+    radial-gradient(45% 40% at 100% 100%, color-mix(in srgb, #f9a8d4 28%, transparent), transparent),
+    radial-gradient(40% 35% at 95% 15%, color-mix(in srgb, #99f6e4 28%, transparent), transparent);
+}
+button, select, input, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .carte:focus-visible {
+  outline: 3px solid var(--c); outline-offset: 3px;
+}
+.page {
+  max-width: 560px; margin: 0 auto; padding: 24px 20px;
+  min-height: 100dvh; display: flex; flex-direction: column; gap: 20px;
+}
+
+/* Barre du haut ------------------------------------------------------- */
+.haut { display: flex; align-items: flex-end; gap: 16px; }
+.progres { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.progres span { color: var(--doux); font-size: 15px; }
+.barre { height: 8px; border-radius: 99px; background: var(--ligne); overflow: hidden; }
+.barre > i { display: block; height: 100%; background: var(--c); transition: width .4s; }
+.outils { position: relative; display: flex; gap: 4px; margin-left: auto; }
+.outils > button { background: none; border: 0; color: var(--c); padding: 6px; border-radius: 10px; }
+.outils svg { width: 24px; height: 24px; display: block; }
+.menu {
+  position: absolute; right: 0; top: 44px; z-index: 5; width: 270px;
+  background: var(--carte); border: 1px solid var(--ligne); border-radius: 18px;
+  padding: 8px; box-shadow: 0 16px 40px rgba(40, 20, 60, .18);
+}
+.menu .ligne { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; }
+.menu select { max-width: 140px; padding: 6px; border-radius: 8px; border: 1px solid var(--ligne); background: var(--fond); }
+.menu input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--c); }
+.menu hr { border: 0; border-top: 1px solid var(--ligne); margin: 6px 0; }
+.menu > button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 10px; border-radius: 10px; }
+.menu > button:hover { background: var(--ligne); }
+
+/* Carte de révision --------------------------------------------------- */
+.centre { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+.carte {
+  background: var(--carte); border-radius: 28px; padding: 28px; min-height: 300px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; text-align: center; cursor: pointer;
+  border: 2px solid color-mix(in srgb, var(--c) 35%, transparent);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--c) 25%, transparent);
+}
+.pastille {
+  font-weight: 800; font-size: 14px; color: var(--c);
+  background: color-mix(in srgb, var(--c) 15%, transparent);
+  padding: 6px 14px; border-radius: 99px;
+}
+.mot { font-family: Fraunces, Georgia, serif; font-weight: 700; font-size: clamp(32px, 9vw, 46px); line-height: 1.1; overflow-wrap: anywhere; }
+.mot.couleur { color: var(--c); }
+.def { font-size: 19px; line-height: 1.45; }
+.def.grande { font-family: Fraunces, Georgia, serif; font-size: 23px; line-height: 1.5; }
+.exemple {
+  font-style: italic; color: var(--doux); line-height: 1.5; width: 100%;
+  background: color-mix(in srgb, var(--c) 10%, transparent); padding: 16px; border-radius: 16px;
+}
+.aide { color: var(--doux); }
+.apparait { animation: apparait .35s ease-out; }
+@keyframes apparait { from { opacity: 0; transform: translateY(6px); } }
+.reponses { display: flex; gap: 14px; min-height: 56px; }
+.reponses button { flex: 1; padding: 16px; border-radius: 99px; border: 0; font-weight: 800; font-size: 17px; }
+.reponses .non { background: var(--non-fond); color: var(--non); }
+.reponses .oui { background: var(--oui-fond); color: var(--oui); }
+
+/* Écran de fin et stats ----------------------------------------------- */
+.titre { font-family: Fraunces, Georgia, serif; font-size: 30px; font-weight: 700; text-align: center; margin: 0; line-height: 1.2; }
+.etoile { font-size: 52px; text-align: center; }
+.bloc { background: color-mix(in srgb, var(--c) 12%, var(--carte)); border-radius: 20px; padding: 16px; }
+.bloc.ouvrable { cursor: pointer; }
+.bloc .tete { display: flex; justify-content: space-between; align-items: center; font-weight: 800; color: var(--c); margin-bottom: 10px; }
+.chiffres { display: flex; justify-content: space-between; text-align: center; }
+.chiffres b { display: block; font-size: 24px; }
+.chiffres small { color: var(--doux); font-size: 13px; }
+.onglets { display: flex; background: var(--ligne); border-radius: 12px; padding: 3px; }
+.onglets button { flex: 1; border: 0; background: none; padding: 8px; border-radius: 10px; font-weight: 600; }
+.onglets .actif { background: var(--carte); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.graph { display: flex; align-items: stretch; gap: 2px; height: 140px; margin-top: 14px; }
+.graph > div { flex: 1; display: flex; flex-direction: column-reverse; }
+.graph i { display: block; }
+.graph .s { background: #86efac; border-radius: 2px 2px 0 0; }
+.graph .r { background: #fca5a5; border-radius: 2px 2px 0 0; }
+.dates { display: flex; justify-content: space-between; color: var(--doux); font-size: 12px; margin-top: 4px; }
+.legende { display: flex; gap: 14px; font-size: 13px; color: var(--doux); margin-top: 6px; }
+.legende i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; }
+.domaine .tete span:last-child { color: var(--doux); font-weight: 600; }
+.domaine small { color: var(--doux); display: block; margin-top: 8px; }
+.lien { background: none; border: 0; color: var(--c); font-weight: 700; padding: 10px; align-self: center; }
+.lien.rouge { color: var(--non); }
+.bouton { background: color-mix(in srgb, var(--c) 18%, transparent); color: var(--c); border: 0; border-radius: 99px; padding: 14px 24px; font-weight: 800; }
+.vide { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; }
+.vide p { color: var(--doux); max-width: 34ch; line-height: 1.5; margin: 0; }
+
+/* Fenêtre d'ajout ----------------------------------------------------- */
+dialog {
+  border: 0; border-radius: 24px; padding: 0; width: min(480px, calc(100% - 32px));
+  background: var(--carte); color: var(--texte);
+}
+dialog::backdrop { background: rgba(30, 20, 40, .4); }
+.form { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.form h2 { font-family: Fraunces, Georgia, serif; margin: 0; }
+.form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 15px; }
+.form input, .form textarea, .form select {
+  border: 1px solid var(--ligne); border-radius: 12px; padding: 12px; background: var(--fond); font-weight: 400;
+}
+.form .actions { display: flex; justify-content: space-between; margin-top: 6px; }
+.form .actions button:disabled { opacity: .4; cursor: default; }
+
+/* Petit message ------------------------------------------------------- */
+#toast {
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--texte); color: var(--fond); padding: 12px 18px; border-radius: 99px;
+  font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .3s; max-width: 90%;
+}
+#toast.visible { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div id="fond"></div>
+<div id="app"></div>
+
+<!-- Sélecteurs de fichiers (cachés) -->
+<input type="file" id="choixMots" accept=".txt,text/plain" hidden>
+<input type="file" id="choixSauvegarde" accept=".json,application/json" hidden>
+
+<!-- Fenêtre pour ajouter un mot -->
+<dialog id="ajout">
+  <div class="form">
+    <h2>Nouveau mot</h2>
+    <label>Le mot <input id="fMot" placeholder="Ex : Sérendipité" oninput="verifierForm()"></label>
+    <label>Définition <textarea id="fDef" rows="2" placeholder="Sa définition" oninput="verifierForm()"></textarea></label>
+    <label>Domaine <select id="fDom"></select></label>
+    <label>Exemple (facultatif) <textarea id="fEx" rows="2" placeholder="Une phrase avec le mot"></textarea></label>
+    <div class="actions">
+      <button class="lien" onclick="fermerAjout()">Annuler</button>
+      <button class="bouton" id="fAjouter" onclick="validerAjout()" disabled>Ajouter</button>
+    </div>
+  </div>
+</dialog>
+
+<div id="toast"></div>
+
+<script>
+// Réglages ---------------------------------------------------------------
+const NOUVEAUX_PAR_JOUR = 8;
+const INTERVALLES = [1, 3, 7, 14, 30, 90, 180];   // en jours
+const NIVEAU_MAITRISE = 4;                         // réussi 4 fois = maîtrisé
+
+// Domaines : couleur et icône ---------------------------------------------
+const COULEURS = {
+  "Géographie": "#14b8a6", "Écologie": "#22c55e", "Presse": "#3b82f6",
+  "Culture": "#a855f7", "Politique": "#ec4899", "Cinéma": "#6366f1",
+  "Peinture": "#06b6d4", "Mode": "#a16207"
+};
+const ICONES = {
+  "Géographie": "🌍", "Écologie": "🌿", "Presse": "📰", "Culture": "🎭",
+  "Politique": "🏛️", "Cinéma": "🎬", "Peinture": "🎨", "Mode": "👕", "Tous": "🗂️"
+};
+function nomDomaine(d) { return d || "Vocabulaire"; }
+function couleur(d) { return COULEURS[d] || "#f97316"; }
+function icone(d) { return ICONES[d] || "📖"; }
+
+// Mémoire du navigateur (équivalent de UserDefaults) ----------------------
+function lire(cle, defaut) {
+  try {
+    const v = localStorage.getItem(cle);
+    return v === null ? defaut : JSON.parse(v);
+  } catch (e) { return defaut; }
+}
+function ecrire(cle, valeur) {
+  try { localStorage.setItem(cle, JSON.stringify(valeur)); } catch (e) {}
+}
+function effacer(cle) {
+  try { localStorage.removeItem(cle); } catch (e) {}
+}
+
+// Dates -------------------------------------------------------------------
+function cleJour(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function ilYa(jours) {
+  const d = new Date();
+  d.setHours(12, 0, 0, 0);
+  d.setDate(d.getDate() - jours);
+  return d;
+}
+function dateCourte(d) { return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" }); }
+
+// Petits outils -----------------------------------------------------------
+function h(s) {   // protège le texte avant de l'afficher
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+function melanger(liste) {
+  const l = liste.slice();
+  for (let i = l.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [l[i], l[j]] = [l[j], l[i]];
+  }
+  return l;
+}
+let minuteurToast = null;
+function info(texte) {
+  const t = document.getElementById("toast");
+  t.textContent = texte;
+  t.classList.add("visible");
+  clearTimeout(minuteurToast);
+  minuteurToast = setTimeout(() => t.classList.remove("visible"), 2600);
+}
+
+// Lit un texte de mots (une ligne = Mot | Définition | Exemple) -----------
+function lireMots(texte, perso) {
+  return (texte || "").split(/\r?\n/).map(ligne => {
+    const p = ligne.split("|").map(s => s.trim());
+    if (p.length !== 3) return null;
+    // Si la définition commence par "(Domaine)", on sépare le domaine
+    let definition = p[1], domaine = null;
+    const m = definition.match(/^\(([^)]*)\)\s*(.*)$/);
+    if (m) { domaine = m[1]; definition = m[2]; }
+    return { mot: p[0], domaine, definition, exemple: p[2], perso };
+  }).filter(Boolean);
+}
+
+// État de l'app -----------------------------------------------------------
+let mots = [], file = [], total = 0;
+let niveaux = {}, prochaines = {};          // prochaines = secondes depuis 1970 (comme en Swift)
+let montrerDef = false, session = {}, onglet = 0, carteOuverte = null;
+let inverse = lire("inverse", false), filtre = "Tous", menuOuvert = false;
+
+function domainesPresents() {
+  const s = new Set(mots.map(m => nomDomaine(m.domaine)));
+  s.add("Vocabulaire");
+  return Array.from(s).sort((a, b) => a.localeCompare(b, "fr"));
+}
+
+// Charge les mots et prépare la file du jour ------------------------------
+function charger() {
+  const base = lireMots(lire("mots", ""), false);
+  const nomsBase = new Set(base.map(m => m.mot.toLowerCase()));
+  const miens = lireMots(lire("mesMots", ""), true).filter(m => !nomsBase.has(m.mot.toLowerCase()));
+  mots = base.concat(miens);
+
+  niveaux = lire("niveaux", {});
+  prochaines = lire("prochaines", {});
+  const maintenant = Date.now() / 1000;
+
+  const choisis = mots.map((m, i) => i).filter(i => filtre === "Tous" || nomDomaine(mots[i].domaine) === filtre);
+
+  // Mots déjà vus dont la date de révision est arrivée
+  const revisions = choisis.filter(i => {
+    const nom = mots[i].mot;
+    if (niveaux[nom] === undefined) return false;
+    const d = prochaines[nom];
+    return d === undefined || d === null || d <= maintenant;
+  });
+
+  // Nouveaux mots : d'abord les tiens, puis les autres, au hasard
+  const jamaisVus = choisis.filter(i => niveaux[mots[i].mot] === undefined);
+  const restants = Math.max(0, NOUVEAUX_PAR_JOUR - nouveauxVusAujourdhui());
+  const nouveaux = melanger(jamaisVus.filter(i => mots[i].perso))
+    .concat(melanger(jamaisVus.filter(i => !mots[i].perso)))
+    .slice(0, restants);
+
+  file = melanger(revisions).concat(nouveaux);
+  total = file.length;
+  montrerDef = false;
+  afficher();
+}
+
+function nouveauxVusAujourdhui() {
+  if (lire("jourNouveaux", "") !== cleJour(new Date())) return 0;
+  return lire("nbNouveaux", 0);
+}
+function compterNouveau() {
+  ecrire("nbNouveaux", nouveauxVusAujourdhui() + 1);
+  ecrire("jourNouveaux", cleJour(new Date()));
+}
+function sauvegarder() {
+  ecrire("niveaux", niveaux);
+  ecrire("prochaines", prochaines);
+}
+
+// Réponses ----------------------------------------------------------------
+function noterReponse(sue, nouveau) {
+  const histo = lire("historique", {});
+  const cle = cleJour(new Date());
+  const jour = histo[cle] || {};
+  jour.reponses = (jour.reponses || 0) + 1;
+  session.reponses = (session.reponses || 0) + 1;
+  if (sue) {
+    jour.sus = (jour.sus || 0) + 1;
+    session.sus = (session.sus || 0) + 1;
+  }
+  if (nouveau) {
+    jour.nouveaux = (jour.nouveaux || 0) + 1;
+    session.nouveaux = (session.nouveaux || 0) + 1;
+  }
+  histo[cle] = jour;
+  ecrire("historique", histo);
+}
+
+function jeSavais() {
+  const numero = file.shift();
+  const nom = mots[numero].mot;
+  const nouveau = niveaux[nom] === undefined;
+  if (nouveau) compterNouveau();
+  noterReponse(true, nouveau);
+  const niveau = niveaux[nom] || 0;
+  const jours = INTERVALLES[Math.min(niveau, INTERVALLES.length - 1)];
+  prochaines[nom] = Date.now() / 1000 + jours * 86400;
+  niveaux[nom] = niveau + 1;
+  montrerDef = false;
+  sauvegarder();
+  afficher();
+}
+
+function jeNeSavaisPas() {
+  const numero = file.shift();
+  const nom = mots[numero].mot;
+  const nouveau = niveaux[nom] === undefined;
+  if (nouveau) compterNouveau();
+  noterReponse(false, nouveau);
+  niveaux[nom] = 0;
+  delete prochaines[nom];
+  file.splice(Math.min(3, file.length), 0, numero);   // revient un peu plus tard
+  montrerDef = false;
+  sauvegarder();
+  afficher();
+}
+
+function retourner() {
+  if (montrerDef) return;
+  montrerDef = true;
+  afficher();
+}
+
+// Stats -------------------------------------------------------------------
+function stats(jours) {
+  const debut = jours ? cleJour(ilYa(jours - 1)) : "";
+  const somme = {};
+  const histo = lire("historique", {});
+  for (const jour in histo) {
+    if (jour < debut) continue;
+    for (const cle in histo[jour]) somme[cle] = (somme[cle] || 0) + histo[jour][cle];
+  }
+  return somme;
+}
+
+function serie() {
+  const histo = lire("historique", {});
+  const aJoue = d => ((histo[cleJour(d)] || {}).reponses || 0) > 0;
+  let decalage = aJoue(new Date()) ? 0 : 1;
+  let n = 0;
+  while (aJoue(ilYa(decalage))) { n++; decalage++; }
+  return n;
+}
+
+function donneesGraphique(jours) {
+  const histo = lire("historique", {});
+  if (jours) {
+    const points = [];
+    for (let i = jours - 1; i >= 0; i--) {
+      const d = ilYa(i);
+      const v = histo[cleJour(d)] || {};
+      points.push({ date: d, reponses: v.reponses || 0, sus: v.sus || 0 });
+    }
+    return points;
+  }
+  // Depuis le début : regroupé par mois
+  const parMois = {};
+  for (const cle in histo) {
+    const mois = cle.slice(0, 7);
+    const p = parMois[mois] || { reponses: 0, sus: 0 };
+    p.reponses += histo[cle].reponses || 0;
+    p.sus += histo[cle].sus || 0;
+    parMois[mois] = p;
+  }
+  return Object.keys(parMois).sort().map(m => ({
+    date: new Date(Number(m.slice(0, 4)), Number(m.slice(5, 7)) - 1, 15),
+    reponses: parMois[m].reponses, sus: parMois[m].sus
+  }));
+}
+
+function statsDomaines() {
+  const parDomaine = {};
+  for (const m of mots) {
+    const cle = nomDomaine(m.domaine);
+    const s = parDomaine[cle] || { nom: cle, domaine: m.domaine, total: 0, vus: 0, maitrises: 0 };
+    s.total++;
+    if (niveaux[m.mot] !== undefined) {
+      s.vus++;
+      if (niveaux[m.mot] >= NIVEAU_MAITRISE) s.maitrises++;
+    }
+    parDomaine[cle] = s;
+  }
+  return Object.values(parDomaine).sort((a, b) => b.total - a.total);
+}
+
+// Morceaux d'écran --------------------------------------------------------
+const SVG_REGLAGES = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>';
+const SVG_PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>';
+const SVG_IMPORT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>';
+
+function barreDuHaut() {
+  let menu = "";
+  if (menuOuvert) {
+    const options = ["Tous"].concat(domainesPresents())
+      .map(d => `<option value="${h(d)}" ${d === filtre ? "selected" : ""}>${icone(d)} ${h(d)}</option>`).join("");
+    menu = `
+      <div class="menu">
+        <label class="ligne"><span>Mode inverse</span>
+          <input type="checkbox" ${inverse ? "checked" : ""} onchange="changerInverse(this.checked)"></label>
+        <label class="ligne"><span>Domaine</span>
+          <select onchange="changerFiltre(this.value)">${options}</select></label>
+        <hr>
+        <button onclick="exporter()">Exporter ma progression</button>
+        <button onclick="ouvrirFichier('choixSauvegarde')">Restaurer une sauvegarde</button>
+      </div>`;
+  }
+  return `
+    <div class="outils">
+      <button onclick="basculerMenu()" aria-label="Réglages" aria-expanded="${menuOuvert}">${SVG_REGLAGES}</button>
+      <button onclick="ouvrirAjout()" aria-label="Ajouter un mot">${SVG_PLUS}</button>
+      <button onclick="ouvrirFichier('choixMots')" aria-label="Importer un fichier de mots">${SVG_IMPORT}</button>
+      ${menu}
+    </div>`;
+}
+
+function chiffre(valeur, legende) {
+  return `<div><b>${h(valeur)}</b><small>${h(legende)}</small></div>`;
+}
+
+function graphique(jours) {
+  const points = donneesGraphique(jours);
+  if (points.length === 0) return "";
+  const max = Math.max(1, ...points.map(p => p.reponses));
+  const barres = points.map(p => {
+    const titre = (jours ? dateCourte(p.date) : p.date.toLocaleDateString("fr-FR", { month: "long", year: "numeric" }))
+      + " : " + p.sus + " réussie(s) sur " + p.reponses;
+    return `<div title="${h(titre)}"><i class="s" style="height:${p.sus / max * 100}%"></i><i class="r" style="height:${(p.reponses - p.sus) / max * 100}%"></i></div>`;
+  }).join("");
+  const format = d => jours ? dateCourte(d) : d.toLocaleDateString("fr-FR", { month: "short", year: "2-digit" });
+  return `
+    <div class="graph">${barres}</div>
+    <div class="dates"><span>${format(points[0].date)}</span><span>${format(points[points.length - 1].date)}</span></div>
+    <div class="legende"><span><i style="background:#86efac"></i>Réussies</span><span><i style="background:#fca5a5"></i>Ratées</span></div>`;
+}
+
+function carteStats(titre, s, c, jours, avecGraphique) {
+  const reponses = s.reponses || 0;
+  const taux = reponses > 0 ? Math.floor((s.sus || 0) * 100 / reponses) : 0;
+  const ouverte = carteOuverte === titre;
+  return `
+    <div class="bloc ${avecGraphique ? "ouvrable" : ""}" style="--c:${c}" ${avecGraphique ? `onclick="ouvrirCarte('${titre}')"` : ""}>
+      <div class="tete"><span>${titre}</span>${avecGraphique ? `<span>${ouverte ? "▲" : "📊"}</span>` : ""}</div>
+      <div class="chiffres">${chiffre(reponses, "réponses")}${chiffre(taux + " %", "réussite")}${chiffre(s.nouveaux || 0, "nouveaux")}</div>
+      ${avecGraphique && ouverte ? graphique(jours) : ""}
+    </div>`;
+}
+
+// Affichage principal -----------------------------------------------------
+function afficher() {
+  const app = document.getElementById("app");
+
+  // Aucun mot
+  if (mots.length === 0) {
+    document.documentElement.style.setProperty("--c", "#a855f7");
+    app.innerHTML = `
+      <div class="page">
+        <div class="vide">
+          <div class="etoile">📥</div>
+          <h1 class="titre">Aucun mot pour l'instant</h1>
+          <p>Importe un fichier .txt avec une ligne par mot : Mot | Définition | Exemple</p>
+          <button class="bouton" onclick="ouvrirFichier('choixMots')">Importer un fichier de mots</button>
+          <button class="lien" onclick="ouvrirFichier('choixSauvegarde')">Restaurer une sauvegarde</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Écran de révision
+  if (file.length > 0) {
+    const m = mots[file[0]];
+    document.documentElement.style.setProperty("--c", couleur(m.domaine));
+    const fait = total - file.length;
+    let contenu;
+    if (inverse) {
+      contenu = `<div class="def grande">${h(m.definition)}</div>`
+        + (montrerDef ? `<div class="mot couleur apparait">${h(m.mot)}</div>` : "");
+    } else {
+      contenu = `<div class="mot">${h(m.mot)}</div>`
+        + (montrerDef ? `<div class="def apparait">${h(m.definition)}</div>` : "");
+    }
+    if (montrerDef) {
+      if (m.exemple !== "–" && m.exemple !== "") contenu += `<div class="exemple apparait">${h(m.exemple)}</div>`;
+    } else {
+      contenu += `<div class="aide">${inverse ? "Touche la carte pour voir le mot" : "Touche la carte pour voir la définition"}</div>`;
+    }
+
+    app.innerHTML = `
+      <div class="page">
+        <div class="haut">
+          <div class="progres">
+            <span>Reste ${file.length} mot(s)${filtre === "Tous" ? "" : " · " + h(filtre)}</span>
+            <div class="barre"><i style="width:${fait / Math.max(total, 1) * 100}%"></i></div>
+          </div>
+          ${barreDuHaut()}
+        </div>
+        <div class="centre">
+          <div class="carte" tabindex="0" role="button" onclick="retourner()">
+            <span class="pastille">${icone(m.domaine)} ${h(nomDomaine(m.domaine))}</span>
+            ${contenu}
+          </div>
+        </div>
+        <div class="reponses">
+          ${montrerDef ? `
+            <button class="non" onclick="jeNeSavaisPas()">✕ Je ne savais pas</button>
+            <button class="oui" onclick="jeSavais()">✓ Je savais</button>` : ""}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // Écran de fin avec les stats
+  const c = filtre === "Tous" ? "#a855f7" : couleur(filtre);
+  document.documentElement.style.setProperty("--c", c);
+  const nbVus = Object.keys(niveaux).length;
+  const nbMaitrises = Object.values(niveaux).filter(n => n >= NIVEAU_MAITRISE).length;
+
+  let detail;
+  if (onglet === 0) {
+    detail = ((session.reponses || 0) > 0 ? carteStats("Cette session", session, "#ec4899", null, false) : "")
+      + carteStats("7 derniers jours", stats(7), "#f97316", 7, true)
+      + carteStats("30 derniers jours", stats(30), "#14b8a6", 30, true)
+      + carteStats("Depuis le début", stats(null), "#a855f7", null, true);
+  } else {
+    detail = statsDomaines().map(s => `
+      <div class="bloc domaine" style="--c:${couleur(s.domaine)}">
+        <div class="tete"><span>${icone(s.domaine)} ${h(s.nom)}</span><span>${s.vus}/${s.total} vus</span></div>
+        <div class="barre"><i style="width:${s.vus / Math.max(s.total, 1) * 100}%"></i></div>
+        <small>${s.maitrises} maîtrisé(s)</small>
+      </div>`).join("");
+  }
+
+  app.innerHTML = `
+    <div class="page">
+      <div class="haut">
+        ${filtre !== "Tous" ? `<span class="pastille">${icone(filtre)} ${h(filtre)}</span>` : ""}
+        ${barreDuHaut()}
+      </div>
+      <div class="etoile">✨</div>
+      <h1 class="titre">${filtre === "Tous" ? "Bravo, fini pour aujourd'hui !" : "Fini pour ce domaine !"}</h1>
+      <div class="bloc" style="background:var(--carte)">
+        <div class="chiffres">${chiffre(nbVus + "/" + mots.length, "mots vus")}${chiffre(nbMaitrises, "maîtrisés")}${chiffre(serie() + " j", "d'affilée")}</div>
+      </div>
+      <div class="onglets">
+        <button class="${onglet === 0 ? "actif" : ""}" onclick="changerOnglet(0)">Périodes</button>
+        <button class="${onglet === 1 ? "actif" : ""}" onclick="changerOnglet(1)">Domaines</button>
+      </div>
+      ${detail}
+      <button class="lien rouge" onclick="remettreAZero()">Tout remettre à zéro</button>
+    </div>`;
+}
+
+// Actions des boutons -----------------------------------------------------
+function basculerMenu() { menuOuvert = !menuOuvert; afficher(); }
+function changerInverse(v) { inverse = v; ecrire("inverse", v); afficher(); }
+function changerFiltre(v) { filtre = v; menuOuvert = false; charger(); }
+function changerOnglet(n) { onglet = n; afficher(); }
+function ouvrirCarte(titre) { carteOuverte = carteOuverte === titre ? null : titre; afficher(); }
+function ouvrirFichier(id) { menuOuvert = false; afficher(); document.getElementById(id).click(); }
+
+function remettreAZero() {
+  if (!confirm("Effacer toute ta progression ? (les mots restent)")) return;
+  for (const cle of ["niveaux", "prochaines", "jourNouveaux", "nbNouveaux", "historique"]) effacer(cle);
+  session = {};
+  charger();
+}
+
+// Ferme le menu si on touche ailleurs
+document.addEventListener("click", e => {
+  if (menuOuvert && !e.target.closest(".outils")) { menuOuvert = false; afficher(); }
+});
+
+// Raccourcis clavier (ordinateur) : Espace = retourner, ← / → = réponses
+document.addEventListener("keydown", e => {
+  if (document.getElementById("ajout").open) return;
+  if (["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName)) return;
+  if (file.length === 0) return;
+  if ((e.key === " " || e.key === "Enter") && !montrerDef) { e.preventDefault(); retourner(); }
+  else if (e.key === "ArrowRight" && montrerDef) jeSavais();
+  else if (e.key === "ArrowLeft" && montrerDef) jeNeSavaisPas();
+});
+
+// Import d'un fichier de mots ---------------------------------------------
+document.getElementById("choixMots").addEventListener("change", async e => {
+  const fichier = e.target.files[0];
+  e.target.value = "";
+  if (!fichier) return;
+  const texte = await fichier.text();
+  const n = lireMots(texte, false).length;
+  if (n === 0) { info("Aucun mot trouvé. Format attendu : Mot | Définition | Exemple"); return; }
+  ecrire("mots", texte);
+  charger();
+  info(n + " mots importés ✅");
+});
+
+// Sauvegarde : exporter et restaurer --------------------------------------
+// Même format que l'app Swift : une sauvegarde passe de l'une à l'autre
+function exporter() {
+  menuOuvert = false;
+  const contenu = {
+    version: 1,
+    niveaux: lire("niveaux", {}),
+    prochaines: lire("prochaines", {}),
+    historique: lire("historique", {}),
+    jourNouveaux: lire("jourNouveaux", ""),
+    nbNouveaux: lire("nbNouveaux", 0),
+    mots: lire("mots", ""),
+    mesMots: lire("mesMots", "")
+  };
+  const blob = new Blob([JSON.stringify(contenu, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Vocabulaire-" + cleJour(new Date()) + ".json";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  afficher();
+  info("Sauvegarde enregistrée ✅");
+}
+
+document.getElementById("choixSauvegarde").addEventListener("change", async e => {
+  const fichier = e.target.files[0];
+  e.target.value = "";
+  if (!fichier) return;
+  let c;
+  try { c = JSON.parse(await fichier.text()); } catch (err) { c = null; }
+  if (!c || typeof c.niveaux !== "object" || c.niveaux === null) {
+    info("Ce fichier n'est pas une sauvegarde valide.");
+    return;
+  }
+  ecrire("niveaux", c.niveaux);
+  ecrire("prochaines", c.prochaines || {});
+  ecrire("historique", c.historique || {});
+  ecrire("jourNouveaux", c.jourNouveaux || "");
+  ecrire("nbNouveaux", c.nbNouveaux || 0);
+  if (c.mots) ecrire("mots", c.mots);
+  if (typeof c.mesMots === "string") ecrire("mesMots", c.mesMots);
+  session = {};
+  charger();
+  info("Progression restaurée : " + Object.keys(c.niveaux).length + " mots vus ✅");
+});
+
+// Ajouter un mot à toi ----------------------------------------------------
+function ouvrirAjout() {
+  menuOuvert = false;
+  afficher();
+  document.getElementById("fDom").innerHTML = domainesPresents()
+    .map(d => `<option value="${h(d)}">${icone(d)} ${h(d)}</option>`).join("");
+  document.getElementById("fDom").value = "Vocabulaire";
+  for (const id of ["fMot", "fDef", "fEx"]) document.getElementById(id).value = "";
+  verifierForm();
+  document.getElementById("ajout").showModal();
+}
+function fermerAjout() { document.getElementById("ajout").close(); }
+function verifierForm() {
+  const ok = document.getElementById("fMot").value.trim() !== "" && document.getElementById("fDef").value.trim() !== "";
+  document.getElementById("fAjouter").disabled = !ok;
+}
+function validerAjout() {
+  const propre = s => s.replace(/\|/g, "/").replace(/\n/g, " ").trim();
+  const mot = propre(document.getElementById("fMot").value);
+  const definition = propre(document.getElementById("fDef").value);
+  const domaine = document.getElementById("fDom").value;
+  const exemple = propre(document.getElementById("fEx").value) || "–";
+  if (!mot || !definition) return;
+  const prefixe = domaine === "Vocabulaire" ? "" : "(" + domaine + ") ";
+  ecrire("mesMots", lire("mesMots", "") + mot + " | " + prefixe + definition + " | " + exemple + "\n");
+  fermerAjout();
+  charger();
+  info("« " + mot + " » ajouté ✅");
+}
+
+// Démarrage ---------------------------------------------------------------
+charger();
+</script>
+</body>
+</html>
